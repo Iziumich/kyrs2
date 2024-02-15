@@ -39,7 +39,6 @@ public class Client {
         }
 
         readerThread.join();
-
         socket.close();
         scanner.close();
     }

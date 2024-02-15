@@ -6,21 +6,45 @@ public class Server {
     static int port = Settings.getServerPort();
     private static final List<ClientHandler> clients = new ArrayList<>();
     private static final File logFile = new File("serverLog.log");
+    private static ServerSocket serverSocket;
 
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(port);
+        serverSocket = new ServerSocket(port);
         System.out.println("Server started on port " + port);
 
         while (true) {
-            Socket clientSocket = serverSocket.accept();
-            System.out.println("New client connected: " + clientSocket);
+            try {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("New client connected: " + clientSocket);
 
-            ClientHandler clientHandler = new ClientHandler(clientSocket);
-            clientHandler.start();
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
+                clientHandler.start();
+            } catch (SocketException e) {
+                break;
+            }
         }
     }
 
-    private static class ClientHandler extends Thread {
+    public static void stopServer() {
+        try {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void disconnectAllClients() {
+        synchronized (clients) {
+            for (ClientHandler client : clients) {
+                client.disconnectClient();
+            }
+            clients.clear();
+        }
+    }
+
+    static class ClientHandler extends Thread {
         private final Socket clientSocket;
         private PrintWriter writer;
         private BufferedReader reader;
@@ -61,6 +85,8 @@ public class Server {
                     broadcast(username + ": " + message, this);
                     log(username + ": " + message);
                 }
+            } catch (SocketException e) {
+                log("Client disconnected: " + e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -76,6 +102,26 @@ public class Server {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+            }
+        }
+
+        public void disconnectClient() {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (writer != null) {
+                    writer.close();
+                }
+                if (clientSocket != null && !clientSocket.isClosed()) {
+                    clientSocket.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                synchronized (clients) {
+                    clients.remove(this);
                 }
             }
         }

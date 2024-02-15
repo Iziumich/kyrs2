@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Client2 {
     private static final String SERVER_IP = Settings.getServerIp();
     private static final int SERVER_PORT = Settings.getServerPort();
-    private static final File logFile = new File("fileClient2.log");
+    private static final File logFile = new File("fileClient.log");
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Socket socket = new Socket(SERVER_IP, SERVER_PORT);
@@ -39,7 +39,6 @@ public class Client2 {
         }
 
         readerThread.join();
-
         socket.close();
         scanner.close();
     }
