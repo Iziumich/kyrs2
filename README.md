@@ -4,6 +4,19 @@
 | Клиент 1 |  | Клиент N |
 | --- |  --- | --- |
 | | Сервер | |
+
+
+
+
+
+    Client->>Server: Connect
+    Server->>Client: Connection established
+    Client->>Server: Send request
+    Server->>Client: Send response
+    Client->>Server: Disconnect
+    Server->>Client: Connection closed
+
+
 ### Архитектура приложений включает в себя следующие компоненты:
 
 - Сервер: Основной компонент, который принимает подключения от клиентов и управляет ими. Он использует многопоточность для обработки нескольких клиентских подключений одновременно.
