@@ -19,11 +19,7 @@ public class ClientServerIntegrationTest {
         // Запуск сервера в отдельном потоке
         serverPort = Settings.getServerPort();
         serverThread = new Thread(() -> {
-            try {
-                Server.main(new String[]{});
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            ServerRunner.main(new String[]{});
         });
         serverThread.start();
 
@@ -32,11 +28,7 @@ public class ClientServerIntegrationTest {
 
         // Запуск клиента в отдельном потоке
         clientThread = new Thread(() -> {
-            try {
-                Client.main(new String[]{});
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
+            ClientRunner.main(new String[]{});
         });
         clientThread.start();
 
